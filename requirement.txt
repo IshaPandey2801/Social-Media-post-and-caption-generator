@@ -1,0 +1,9 @@
+diffusers
+transformers
+accelerate
+safetensors
+ftfy
+gradio
+torch
+Pillow
+nltk

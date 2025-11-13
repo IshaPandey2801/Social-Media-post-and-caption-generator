@@ -1,0 +1,22 @@
+# Python caches
+__pycache__/
+*.pyc
+*.pyo
+
+# Virtual environments
+venv/
+env/
+
+# Jupyter/Colab
+.ipynb_checkpoints/
+
+# System files
+.DS_Store
+
+# Model weights / large files (optional)
+*.ckpt
+*.safetensors
+models/
+
+# Data
+data/generated/*
