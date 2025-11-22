@@ -1,4 +1,3 @@
-# Social-Media-post-and-caption-generator
 # Social Media Post & Caption Generator
 
 A Generative AI–based web app that creates **social media captions and hashtags** from a short user prompt, with support for different **tones** and **platforms** (Instagram, LinkedIn, Twitter/X, etc.).  
