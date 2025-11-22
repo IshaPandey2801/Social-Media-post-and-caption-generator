@@ -1,0 +1,14 @@
+diffusers
+transformers>=4.30.0
+datasets
+evaluate
+accelerate
+sentencepiece
+pandas
+safetensors
+ftfy
+gradio
+torch
+Pillow
+nltk
+gradio
