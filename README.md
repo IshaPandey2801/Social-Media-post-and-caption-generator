@@ -15,7 +15,7 @@ The app uses:
 
 ---
 
-## 🔍 Features
+  Features
 
 - **Prompt-based caption generation**:  
   Enter a short idea like _"a child playing with toys on a rainy day"_ and generate a base caption.
@@ -35,7 +35,7 @@ The app uses:
 
 ---
 
-## 🏗️ Project Architecture
+Project Architecture
 
 High-level flow:
 
@@ -69,7 +69,7 @@ High-level flow:
 
 ---
 
-## 📂 Project Structure
+ Project Structure
 
 ```text
 Social-media-post-and-caption-generator/
