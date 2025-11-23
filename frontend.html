@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Social Media Post & Caption Generator — Frontend</title>
+  <style>
+    :root{--bg:#0f1724;--card:#0b1220;--muted:#94a3b8;--accent:#7c3aed;--glass:rgba(255,255,255,0.03)}
+    *{box-sizing:border-box}
+    body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,'Helvetica Neue',Arial; margin:0; background:linear-gradient(180deg,var(--bg),#071028 120%); color:#e6eef8; -webkit-font-smoothing:antialiased}
+    .container{max-width:1000px;margin:40px auto;padding:20px}
+    header{display:flex;align-items:center;gap:16px;margin-bottom:18px}
+    .logo{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,var(--accent),#06b6d4);display:flex;align-items:center;justify-content:center;font-weight:700;color:white}
+    h1{font-size:20px;margin:0}
+    p.lead{margin:4px 0 0;color:var(--muted);font-size:13px}
+
+    .grid{display:grid;grid-template-columns:1fr 420px;gap:18px}
+    .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); padding:18px;border-radius:14px; box-shadow: 0 6px 18px rgba(2,6,23,0.6)}
+    label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
+    input[type=text], select, textarea{width:100%;padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit;font-size:14px}
+    textarea{min-height:140px;resize:vertical}
+    .row{display:flex;gap:12px}
+    .small{flex:1}
+    .actions{display:flex;gap:8px;align-items:center;margin-top:12px}
+    button{background:var(--accent);border:none;padding:10px 14px;border-radius:10px;color:#fff;font-weight:600;cursor:pointer}
+    button.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06)}
+    .muted{color:var(--muted);font-size:13px}
+
+    /* result pane */
+    .result{white-space:pre-wrap;font-size:15px;line-height:1.5;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.02));padding:14px;border-radius:12px;min-height:120px}
+    .toolbar{display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:10px}
+    .chips{display:flex;gap:8px}
+    .chip{background:var(--glass);padding:6px 8px;border-radius:999px;font-size:13px;color:var(--muted)}
+
+    footer{margin-top:18px;color:var(--muted);font-size:13px}
+
+    @media (max-width:980px){.grid{grid-template-columns:1fr;}.container{margin:20px;padding:12px}}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo">SM</div>
+      <div>
+        <h1>Social Media Post & Caption Generator</h1>
+        <p class="lead">Generate short social posts, captions and hashtags for different platforms.</p>
+      </div>
+    </header>
+
+    <div class="grid">
+      <section class="card" id="controls">
+        <label for="platform">Platform</label>
+        <select id="platform">
+          <option value="instagram">Instagram</option>
+          <option value="facebook">Facebook</option>
+          <option value="twitter">X</option>
+          <option value="linkedin">LinkedIn</option>
+          <option value="tiktok">TikTok</option>
+        </select>
+
+        <div style="height:12px"></div>
+
+        <label for="tone">Tone</label>
+        <select id="tone">
+          <option value="casual">Casual</option>
+          <option value="professional">Professional</option>
+          <option value="funny">Funny</option>
+          <option value="inspirational">Inspirational</option>
+          <option value="educational">Educational</option>
+        </select>
+
+        <div style="height:12px"></div>
+
+        <label for="length">Length</label>
+        <div class="row">
+          <select id="length" class="small">
+            <option value="short">Short & sweet</option>
+            <option value="medium" selected>Medium</option>
+            <option value="long">Detailed</option>
+          </select>
+          <input id="hashtags" type="text" placeholder="Keywords / hashtags (comma separated)" />
+        </div>
+
+        <div style="height:12px"></div>
+        <label for="prompt">Write a short prompt about the post or paste your draft</label>
+        <textarea id="prompt" placeholder="E.g. 'Promoting our new summer collection with 20% off — target: young adults, playful tone' "></textarea>
+
+        <div class="actions">
+          <button id="generate">Generate</button>
+          <button id="regenerate" class="ghost">Regenerate</button>
+          <button id="save" class="ghost">Save</button>
+          <div style="flex:1"></div>
+          <span class="muted" id="status">Ready</span>
+        </div>
+
+        <div style="height:8px"></div>
+        <div class="muted">Tips: Use clear target audience and 2–4 keywords for better results. Replace the API endpoint in the JS with your backend.</div>
+      </section>
+
+      <aside class="card">
+        <div class="toolbar">
+          <div class="chips">
+            <div class="chip" id="chip-platform">Instagram</div>
+            <div class="chip" id="chip-tone">Casual</div>
+            <div class="chip" id="chip-length">Medium</div>
+          </div>
+          <div>
+            <button id="copy">Copy</button>
+            <button id="download" class="ghost">Download</button>
+          </div>
+        </div>
+
+        <div class="result" id="result">Your generated post will appear here.</div>
+
+        <div style="height:12px"></div>
+        <label class="muted">Generated Hashtags</label>
+        <div id="hashtagsOut" class="muted" style="margin-top:6px">#summer #sale</div>
+
+        <footer>
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div>Model: <strong id="modelName">local-fallback</strong></div>
+            <div class="muted">Latency: <span id="latency">—</span></div>
+          </div>
+        </footer>
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    // ---------- CONFIG ----------
+    // Replace this with your backend endpoint that talks to the AI (POST JSON)
+    const API_ENDPOINT = '/api/generate';
+    // ---------- UI bindings ----------
+    const platformEl = document.getElementById('platform');
+    const toneEl = document.getElementById('tone');
+    const lengthEl = document.getElementById('length');
+    const promptEl = document.getElementById('prompt');
+    const hashtagsIn = document.getElementById('hashtags');
+    const generateBtn = document.getElementById('generate');
+    const regenerateBtn = document.getElementById('regenerate');
+    const statusEl = document.getElementById('status');
+    const resultEl = document.getElementById('result');
+    const copyBtn = document.getElementById('copy');
+    const downloadBtn = document.getElementById('download');
+    const saveBtn = document.getElementById('save');
+    const modelName = document.getElementById('modelName');
+    const latencyEl = document.getElementById('latency');
+    const hashtagsOut = document.getElementById('hashtagsOut');
+
+    function updateChips(){
+      document.getElementById('chip-platform').textContent = platformEl.options[platformEl.selectedIndex].text;
+      document.getElementById('chip-tone').textContent = toneEl.options[toneEl.selectedIndex].text;
+      document.getElementById('chip-length').textContent = lengthEl.options[lengthEl.selectedIndex].text;
+    }
+    [platformEl,toneEl,lengthEl].forEach(el=>el.addEventListener('change', updateChips));
+
+    function setStatus(text, busy=false){
+      statusEl.textContent = text; if(busy) statusEl.style.opacity = 0.9; else statusEl.style.opacity=0.7;
+    }
+
+    async function callApi(payload){
+      // Try the configured API first; if it fails, fallback to a local generator
+      const t0 = performance.now();
+      try{
+        const res = await fetch(API_ENDPOINT, {
+          method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload)
+        });
+        const t1 = performance.now();
+        latencyEl.textContent = Math.round(t1-t0) + ' ms';
+        if(!res.ok) throw new Error('Server error ' + res.status);
+        const data = await res.json();
+        // Expecting {post: '...', hashtags:['#a','#b'], model: 'gpt-..'}
+        return data;
+      }catch(err){
+        console.warn('API failed, using local fallback:', err);
+        // fallback: simple deterministic generator to allow local testing without server
+        const fallback = localGenerate(payload);
+        const t1 = performance.now();
+        latencyEl.textContent = Math.round(t1-t0) + ' ms (local)';
+        return fallback;
+      }
+    }
+
+    function localGenerate({platform, tone, length, prompt, keywords}){
+      // VERY simple fallback generator — replace with real model on the server
+      const base = prompt || 'Check this out!';
+      const kw = keywords && keywords.length ? (' ' + keywords.slice(0,4).map(k=>'#'+k.replace(/^#?/,'')).join(' ')) : '';
+      const postfix = (length==='short')? ' — short update.' : (length==='long')? ' — Here are the details:' : '';
+      const toneText = (tone==='professional')? 'We are pleased to announce' : (tone==='funny')? 'LOL —' : (tone==='inspirational')? 'Be inspired:' : '';
+      return {
+        post: `${toneText} ${base}${postfix}\n\n${kw}`.trim(),
+        hashtags: (keywords && keywords.length)? keywords.slice(0,6).map(k=> '#'+k.replace(/^#?/,'')) : ['#social','#post'],
+        model: 'local-fallback'
+      };
+    }
+
+    async function generate(updated){
+      setStatus('Generating...', true);
+      generateBtn.disabled = true;
+      regenerateBtn.disabled = true;
+      const payload = {
+        platform: platformEl.value,
+        tone: toneEl.value,
+        length: lengthEl.value,
+        prompt: promptEl.value.trim(),
+        keywords: (hashtagsIn.value || '').split(',').map(s=>s.trim()).filter(Boolean),
+        options: {max_length: (lengthEl.value==='short'?50: lengthEl.value==='long'?220:120)}
+      };
+      try{
+        const data = await callApi(payload);
+        resultEl.textContent = data.post || 'No result';
+        hashtagsOut.textContent = (data.hashtags || []).join(' ');
+        modelName.textContent = data.model || 'unknown';
+        setStatus('Done');
+      }catch(e){
+        console.error(e);
+        setStatus('Error — see console');
+      }finally{
+        generateBtn.disabled = false;
+        regenerateBtn.disabled = false;
+      }
+    }
+
+    generateBtn.addEventListener('click', ()=>generate(false));
+    regenerateBtn.addEventListener('click', ()=>generate(true));
+
+    copyBtn.addEventListener('click', async ()=>{
+      try{
+        await navigator.clipboard.writeText(resultEl.textContent);
+        setStatus('Copied to clipboard');
+      }catch(e){ setStatus('Copy failed'); }
+    });
+
+    downloadBtn.addEventListener('click', ()=>{
+      const blob = new Blob([resultEl.textContent], {type:'text/plain'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'post.txt'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+      setStatus('Downloaded');
+    });
+
+    saveBtn.addEventListener('click', ()=>{
+      // lightweight local save example: store in localStorage array
+      const key = 'sm_saved_posts_v1';
+      const arr = JSON.parse(localStorage.getItem(key) || '[]');
+      arr.unshift({post: resultEl.textContent, hashtags: hashtagsOut.textContent, date:new Date().toISOString()});
+      localStorage.setItem(key, JSON.stringify(arr.slice(0,50)));
+      setStatus('Saved locally');
+    });
+
+    // initialize
+    updateChips();
+  </script>
+</body>
+</html>
